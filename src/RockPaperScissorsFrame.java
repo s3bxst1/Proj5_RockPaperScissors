@@ -2,95 +2,100 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Random;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
 
 public class RockPaperScissorsFrame extends JFrame {
+    private int playerWins = 0;
+    private int computerWins = 0;
+    private int ties = 0;
+
+    private JLabel playerWinsLabel;
+    private JLabel computerWinsLabel;
+    private JLabel tiesLabel;
     private JTextArea resultsTextArea;
-    private int playerWins;
-    private int computerWins;
-    private int ties;
 
     public RockPaperScissorsFrame() {
         setTitle("Rock Paper Scissors Game");
+        setSize(400, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // ... (Other components: buttons, stats panel, etc.)
+        JPanel buttonsPanel = new JPanel();
+        buttonsPanel.setBorder(BorderFactory.createTitledBorder("Choose Your Move"));
 
-        // Add action listeners for buttons
-        rockButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                playGame("Rock");
-            }
-        });
+        ImageIcon rockIcon = resizeImage("rock.png");
+        JButton rockButton = new JButton(rockIcon);
+        rockButton.addActionListener(new ButtonClickListener("rock"));
 
-        paperButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                playGame("Paper");
-            }
-        });
+        ImageIcon paperIcon = resizeImage("paper.png");
+        JButton paperButton = new JButton(paperIcon);
+        paperButton.addActionListener(new ButtonClickListener("paper"));
 
-        scissorsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                playGame("Scissors");
-            }
-        });
+        ImageIcon scissorsIcon = resizeImage("scissors.png");
+        JButton scissorsButton = new JButton(scissorsIcon);
+        scissorsButton.addActionListener(new ButtonClickListener("scissors"));
 
+        JButton quitButton = new JButton("Quit");
         quitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Handle quitting the game (e.g., close the window)
-                System.exit(0);
+                dispose();
             }
         });
 
-        // ...
+        buttonsPanel.add(rockButton);
+        buttonsPanel.add(paperButton);
+        buttonsPanel.add(scissorsButton);
+        buttonsPanel.add(quitButton);
+
+        JPanel statsPanel = new JPanel(new GridLayout(3, 2));
+        statsPanel.setBorder(BorderFactory.createTitledBorder("Stats"));
+        playerWinsLabel = new JLabel("Player Wins: 0");
+        computerWinsLabel = new JLabel("Computer Wins: 0");
+        tiesLabel = new JLabel("Ties: 0");
+        statsPanel.add(playerWinsLabel);
+        statsPanel.add(computerWinsLabel);
+        statsPanel.add(tiesLabel);
+
+        resultsTextArea = new JTextArea(10, 20);
+        resultsTextArea.setEditable(false);
+        JScrollPane scrollPane = new JScrollPane(resultsTextArea);
+
+        add(buttonsPanel, BorderLayout.NORTH);
+        add(statsPanel, BorderLayout.CENTER);
+        add(scrollPane, BorderLayout.SOUTH);
     }
 
-    private void playGame(String playerChoice) {
-        // Generate computer's choice (randomly)
-        String[] choices = {"Rock", "Paper", "Scissors"};
-        Random random = new Random();
-        String computerChoice = choices[random.nextInt(choices.length)];
+    private ImageIcon resizeImage(String imagePath) {
+        ImageIcon icon = new ImageIcon(imagePath);
+        Image img = icon.getImage();
+        Image resizedImg = img.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+        return new ImageIcon(resizedImg);
+    }
 
-        // Determine the winner
-        String result;
-        if (playerChoice.equals(computerChoice)) {
-            result = "Tie";
-            ties++;
-        } else if ((playerChoice.equals("Rock") && computerChoice.equals("Scissors")) ||
-                (playerChoice.equals("Paper") && computerChoice.equals("Rock")) ||
-                (playerChoice.equals("Scissors") && computerChoice.equals("Paper"))) {
-            result = "Player wins!";
-            playerWins++;
-        } else {
-            result = "Computer wins!";
-            computerWins++;
+    private class ButtonClickListener implements ActionListener {
+        private String playerChoice;
+
+        public ButtonClickListener(String choice) {
+            this.playerChoice = choice;
         }
 
-        // Update stats and results text area
-        updateStats();
-        updateResultsTextArea(playerChoice, computerChoice, result);
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            // Your game logic here
+        }
     }
-
-    private void updateStats() {
-        // Update the text fields for player wins, computer wins, and ties
-        // (Use the playerWins, computerWins, and ties variables)
-    }
-
-    private void updateResultsTextArea(String playerChoice, String computerChoice, String result) {
-        // Append the game result to the JTextArea
-        resultsTextArea.append(playerChoice + " vs. " + computerChoice + " - " + result + "\n");
-    }
-
-    // Other methods (e.g., initializing components, setting up layout, etc.)
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> {
-            new RockPaperScissorsFrame().setVisible(true);
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                RockPaperScissorsFrame frame = new RockPaperScissorsFrame();
+                frame.setVisible(true);
+            }
         });
     }
 }
